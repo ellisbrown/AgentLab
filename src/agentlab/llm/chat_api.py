@@ -8,7 +8,7 @@ from typing import Optional
 
 import anthropic
 import openai
-from openai import NOT_GIVEN, OpenAI
+from openai import NOT_GIVEN, OpenAI, AzureOpenAI
 
 import agentlab.llm.tracking as tracking
 from agentlab.llm.base_api import AbstractChatModel, BaseModelArgs
@@ -415,14 +415,20 @@ class AzureChatModel(ChatModel):
             endpoint
         ), "AZURE_OPENAI_ENDPOINT has to be defined in the environment when using AzureChatModel"
 
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+        if api_version is None:
+            logging.warning("AZURE_OPENAI_API_VERSION is not set, using default value: preview")
+            api_version = "preview"
+        logging.info(f"Using Azure OpenAI API version: {api_version}")
+
         if deployment_name is not None:
             logging.info(
                 f"Deployment name is deprecated for Azure OpenAI and won't be used. Using model name: {model_name}."
             )
 
         client_args = {
-            "base_url": endpoint,
-            "default_query": {"api-version": "preview"},
+            "azure_endpoint": endpoint,
+            "api_version": api_version,
         }
         super().__init__(
             model_name=model_name,
@@ -431,7 +437,7 @@ class AzureChatModel(ChatModel):
             max_tokens=max_tokens,
             max_retry=max_retry,
             min_retry_wait_time=min_retry_wait_time,
-            client_class=OpenAI,
+            client_class=AzureOpenAI,
             client_args=client_args,
             pricing_func=tracking.get_pricing_openai,
             log_probs=log_probs,
