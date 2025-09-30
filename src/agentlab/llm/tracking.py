@@ -107,13 +107,13 @@ def get_pricing_openrouter():
         for model in model_metadata["data"]
     }
 
-
+@cache
 def get_pricing_openai():
     """Returns a dictionary of model pricing for OpenAI models."""
     try:
         cost_dict = openai_info.MODEL_COST_PER_1K_TOKENS
     except Exception as e:
-        logging.warning(
+        logging.info(
             f"Failed to get OpenAI pricing: {e}. "
             "Please install langchain-community or use LiteLLM API for pricing information."
         )

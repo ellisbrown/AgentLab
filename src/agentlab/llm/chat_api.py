@@ -261,7 +261,7 @@ class ChatModel(AbstractChatModel):
                 self.input_cost = float(pricings[model_name]["prompt"])
                 self.output_cost = float(pricings[model_name]["completion"])
             except KeyError:
-                logging.warning(
+                logging.info(
                     f"Model {model_name} not found in the pricing information, prices are set to 0. Maybe try upgrading langchain_community."
                 )
                 self.input_cost = 0.0
